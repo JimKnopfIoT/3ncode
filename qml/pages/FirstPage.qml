@@ -37,9 +37,10 @@ Page {
 
     property alias container: container.value
     property bool isAudioOnly: false
-    // Re-gain mode: copy the video stream untouched, only amplify and
-    // re-encode the audio. For recordings that are far too quiet.
-    property bool isRegain: false
+    // Re-gain: amplify the audio by regainDb. Combines with any container
+    // conversion; without a chosen container the video stream is copied
+    // untouched and only the audio is re-encoded (louder).
+    property bool regainOn: false
     property int regainDb: 12
 
     // Video settings ///
@@ -59,33 +60,38 @@ Page {
 
     property int i: 0
 
-    onSourceFileChanged: {
-        targetFile = sourceFile.substr(0, sourceFile.lastIndexOf('.')) + "." + container.value || sourceFile;
+    // True while no real container conversion is selected — either nothing
+    // yet, or the explicit "original (re-gain only)" entry.
+    readonly property bool noConversion:
+        container.value === "" || container.value === "original"
+
+    function updateTargetFile() {
+        // Without a container conversion the result keeps the source's own
+        // extension.
+        var ext = !noConversion
+                ? container.value
+                : sourceFile.substr(sourceFile.lastIndexOf('.') + 1)
+        targetFile = sourceFile.substr(0, sourceFile.lastIndexOf('.')) + "." + ext || sourceFile;
         while (targetFile == sourceFile) {
             i = i+1
-            targetFile = sourceFile.substr(0, sourceFile.lastIndexOf('.')) + "."+i+"." + container.value || sourceFile;
+            targetFile = sourceFile.substr(0, sourceFile.lastIndexOf('.')) + "."+i+"." + ext || sourceFile;
         }
     }
 
-    onContainerChanged: {
-        targetFile = sourceFile.substr(0, sourceFile.lastIndexOf('.')) + "." + container.value || sourceFile;
-        while (targetFile == sourceFile) {
-            i = i+1
-            targetFile = sourceFile.substr(0, sourceFile.lastIndexOf('.')) + "."+i+"." + container.value || sourceFile;
-        }
-    }
+    onSourceFileChanged: updateTargetFile()
+    onContainerChanged: updateTargetFile()
 
     function createFFmpegCommand() {
         var cmd = " -i \"" + sourceFile + "\""
 
-        // Re-gain: video copied bit for bit, audio boosted by the chosen
-        // amount. Example:
+        // Re-gain without a container conversion: video copied bit for bit,
+        // only the audio is boosted and re-encoded. Example:
         // ffmpeg -i in.mp4 -c:v copy -af volume=12dB -acodec aac -ab 192k out.mp4
-        if (isRegain) {
+        if (regainOn && noConversion) {
             cmd += " -c:v copy"
             cmd += " -af volume=" + regainDb + "dB"
-            cmd += " -acodec " + acodec
-            cmd += " -ab " + abitrate + "k"
+            cmd += " -acodec aac"
+            cmd += " -ab 192k"
             cmd += " \"" + targetFile + "\""
             return cmd
         }
@@ -95,6 +101,13 @@ Page {
         // ffmpeg -i ''  -vn -ab 128k -ar 44100 -b 2000k -f wav -vcodec libxvid -ac 2 -acodec pcm_s16le '.wav'
         if (isAudioOnly) {
             cmd += " -vn"
+        }
+        if (regainOn) {
+            // The gain filter needs a real audio encode; "copy" cannot
+            // filter, so fall back to aac then.
+            cmd += " -af volume=" + regainDb + "dB"
+            if (acodec === "copy")
+                acodec = "aac"
         }
         cmd += " -ab " + abitrate + "k"
         cmd += " -ar " + samplerate
@@ -184,9 +197,20 @@ Page {
                 labelMargin: Theme.paddingLarge
                 onClicked: pageStack.push(Qt.resolvedUrl("ContainerPage.qml"), {dataContainer: page});
             }
+            TextSwitch {
+                id: regainSwitch
+                text: qsTr("Boost audio (re-gain)")
+                description: qsTr("Makes too quiet recordings louder. Works "
+                    + "together with any conversion — or on its own: without "
+                    + "a chosen target container the video is copied "
+                    + "untouched and only the audio gets louder.")
+                checked: regainOn
+                automaticCheck: false
+                onClicked: regainOn = !regainOn
+            }
             Slider {
                 id: regainSlider
-                visible: isRegain
+                visible: regainOn
                 width: parent.width
                 label: qsTr("Gain — how much louder the audio gets")
                 //: %1 is the gain in decibels; roughly +6 dB = twice as loud
@@ -197,22 +221,10 @@ Page {
                 value: regainDb
                 onSliderValueChanged: regainDb = Math.round(sliderValue)
             }
-            Label {
-                visible: isRegain
-                x: Theme.paddingLarge
-                width: parent.width - 2 * Theme.paddingLarge
-                wrapMode: Text.WordWrap
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.secondaryColor
-                text: qsTr("The video stream is copied untouched — fast and "
-                    + "lossless. Only the audio is amplified. The original "
-                    + "file is kept; the result is saved as a copy. "
-                    + "+12 dB roughly quadruples the loudness.")
-            }
 
             BackgroundItem {
                 id: videoItem
-                visible: !isAudioOnly && !isRegain
+                visible: !isAudioOnly && !noConversion
 
                 width: parent.width
                 height: vColumn.height + vLbl.height
@@ -267,7 +279,7 @@ Page {
 
             BackgroundItem {
                 id: audioItem
-                visible: !isRegain
+                visible: !noConversion
                 height: aColumn.height + aLbl.height
 
                 onClicked: pageStack.push(Qt.resolvedUrl("DetailsSettings.qml"), { dataContainer: page, isAudioDialog: true } )
@@ -327,7 +339,9 @@ Page {
                 text: qsTr("Encode")
                 preferredWidth: parent.width - (Theme.paddingLarge * 2)
                 anchors.horizontalCenter: parent.horizontalCenter
-                enabled: (sourceFile != "" && targetFile != "" && container.value != "") ? true : false
+                // A real container conversion OR re-gain alone is enough.
+                enabled: (sourceFile != "" && targetFile != ""
+                          && (!noConversion || regainOn)) ? true : false
                 Image {
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.paddingLarge

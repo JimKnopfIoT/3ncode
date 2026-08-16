@@ -3,23 +3,13 @@ import QtQuick 2.0
 ListModel {
     id: containerModel
     ListElement {
-        title: "---Fix---"
+        title: "---Re-Gain---"
     }
     ListElement {
-        // Boost too quiet recordings: video stream is copied untouched,
-        // only the audio is amplified and re-encoded.
-        title: "regain (louder audio, video untouched)"
-        ext: "mp4"
-        type: "regain"
-        vcodec: "copy"
-        vbitrate: "0"
-        resolution: "no change"
-        aspect: "no change"
-        acodec: "aac"
-        abitrate: "192"
-        sample: "48000"
-        channel: "2"
-        lang: "not set"
+        // No conversion: container/video stay as they are, only the audio
+        // is boosted. Selecting this turns the re-gain switch on.
+        title: "original (audio re-gain only)"
+        type: "none"
     }
     ListElement {
         title: "---Video---"

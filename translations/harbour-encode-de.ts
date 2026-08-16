@@ -202,8 +202,12 @@
         <translation>+%1 dB</translation>
     </message>
     <message>
-        <source>The video stream is copied untouched — fast and lossless. Only the audio is amplified. The original file is kept; the result is saved as a copy. +12 dB roughly quadruples the loudness.</source>
-        <translation>Die Videospur wird unverändert übernommen — schnell und verlustfrei. Nur der Ton wird verstärkt. Das Original bleibt erhalten; das Ergebnis wird als Kopie gespeichert. +12 dB ≈ vierfache Lautstärke.</translation>
+        <source>Boost audio (re-gain)</source>
+        <translation>Ton verstärken (Re-Gain)</translation>
+    </message>
+    <message>
+        <source>Makes too quiet recordings louder. Works together with any conversion — or on its own: without a chosen target container the video is copied untouched and only the audio gets louder.</source>
+        <translation>Macht zu leise Aufnahmen lauter. Funktioniert zusammen mit jeder Konvertierung — oder allein: Ohne gewählten Ziel-Container wird das Video unverändert kopiert und nur der Ton lauter.</translation>
     </message>
     <message>
         <source>Encode</source>

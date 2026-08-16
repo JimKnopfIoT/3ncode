@@ -16,8 +16,12 @@ Summary:    An app to encode audio&video files
 Version:    1.5
 Release:    1
 Group:      Qt/Qt
-License:    LICENSE
-URL:        http://example.org/
+# Neutral build host so built RPMs carry no real hostname/domain.
+%define _buildhost reproducible-builder
+License:    GPL-3.0-or-later
+URL:        https://github.com/JimKnopfIoT/3ncode
+Vendor:     3ncode contributors
+Packager:   3ncode contributors
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-encode.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
@@ -71,6 +75,8 @@ chmod +x %{buildroot}/usr/share/%{name}/ffmpeg_static
 
 # >> install post
 # << install post
+
+strip %{buildroot}%{_bindir}/%{name} || :
 
 desktop-file-install --delete-original       \
   --dir %{buildroot}%{_datadir}/applications             \
