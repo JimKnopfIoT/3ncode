@@ -13,7 +13,7 @@ Name:       harbour-encode
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    An app to encode audio&video files
-Version:    1.4
+Version:    1.5
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
@@ -53,11 +53,15 @@ rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/%{name}
 %ifarch armv7hl
 echo "Include ffmpeg for armv7hl"
-cp ../harbour-encode/ffmpeg_static_arm %{buildroot}/usr/share/%{name}/ffmpeg_static
+cp ffmpeg_static_arm %{buildroot}/usr/share/%{name}/ffmpeg_static
 %endif
 %ifarch i486
 echo "Include ffmpeg for i486"
-cp ../harbour-encode/ffmpeg_static_i486 %{buildroot}/usr/share/%{name}/ffmpeg_static
+cp ffmpeg_static_i486 %{buildroot}/usr/share/%{name}/ffmpeg_static
+%endif
+%ifarch aarch64
+echo "Include ffmpeg for aarch64"
+cp ffmpeg_static_aarch64 %{buildroot}/usr/share/%{name}/ffmpeg_static
 %endif
 echo "Make sure ffmpeg_static is executable"
 chmod +x %{buildroot}/usr/share/%{name}/ffmpeg_static

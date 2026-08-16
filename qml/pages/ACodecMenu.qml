@@ -7,7 +7,7 @@ ListModel {
     ListElement { text: "dca" }
     ListElement { text: "eac3" }
     ListElement { text: "flac" }
-    ListElement { text: "libfaac" }
+    ListElement { text: "aac" }
     ListElement { text: "libmp3lame" }
     ListElement { text: "libopus" }
     ListElement { text: "libvorbis" }

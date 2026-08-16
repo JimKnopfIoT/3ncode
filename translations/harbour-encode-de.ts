@@ -193,6 +193,19 @@
         <translation>Datei öffnen</translation>
     </message>
     <message>
+        <source>Gain — how much louder the audio gets</source>
+        <translation>Verstärkung — um so viel wird der Ton lauter</translation>
+    </message>
+    <message>
+        <source>+%1 dB</source>
+        <extracomment>%1 is the gain in decibels; roughly +6 dB = twice as loud</extracomment>
+        <translation>+%1 dB</translation>
+    </message>
+    <message>
+        <source>The video stream is copied untouched — fast and lossless. Only the audio is amplified. The original file is kept; the result is saved as a copy. +12 dB roughly quadruples the loudness.</source>
+        <translation>Die Videospur wird unverändert übernommen — schnell und verlustfrei. Nur der Ton wird verstärkt. Das Original bleibt erhalten; das Ergebnis wird als Kopie gespeichert. +12 dB ≈ vierfache Lautstärke.</translation>
+    </message>
+    <message>
         <source>Encode</source>
         <translation>Encode</translation>
     </message>

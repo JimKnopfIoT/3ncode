@@ -37,6 +37,10 @@ Page {
 
     property alias container: container.value
     property bool isAudioOnly: false
+    // Re-gain mode: copy the video stream untouched, only amplify and
+    // re-encode the audio. For recordings that are far too quiet.
+    property bool isRegain: false
+    property int regainDb: 12
 
     // Video settings ///
     property string vcodec
@@ -73,6 +77,18 @@ Page {
 
     function createFFmpegCommand() {
         var cmd = " -i \"" + sourceFile + "\""
+
+        // Re-gain: video copied bit for bit, audio boosted by the chosen
+        // amount. Example:
+        // ffmpeg -i in.mp4 -c:v copy -af volume=12dB -acodec aac -ab 192k out.mp4
+        if (isRegain) {
+            cmd += " -c:v copy"
+            cmd += " -af volume=" + regainDb + "dB"
+            cmd += " -acodec " + acodec
+            cmd += " -ab " + abitrate + "k"
+            cmd += " \"" + targetFile + "\""
+            return cmd
+        }
 
         // Audio conversions first
         // example ffmpeg cmd:
@@ -168,9 +184,35 @@ Page {
                 labelMargin: Theme.paddingLarge
                 onClicked: pageStack.push(Qt.resolvedUrl("ContainerPage.qml"), {dataContainer: page});
             }
+            Slider {
+                id: regainSlider
+                visible: isRegain
+                width: parent.width
+                label: qsTr("Gain — how much louder the audio gets")
+                //: %1 is the gain in decibels; roughly +6 dB = twice as loud
+                valueText: qsTr("+%1 dB").arg(Math.round(sliderValue))
+                minimumValue: 3
+                maximumValue: 24
+                stepSize: 1
+                value: regainDb
+                onSliderValueChanged: regainDb = Math.round(sliderValue)
+            }
+            Label {
+                visible: isRegain
+                x: Theme.paddingLarge
+                width: parent.width - 2 * Theme.paddingLarge
+                wrapMode: Text.WordWrap
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryColor
+                text: qsTr("The video stream is copied untouched — fast and "
+                    + "lossless. Only the audio is amplified. The original "
+                    + "file is kept; the result is saved as a copy. "
+                    + "+12 dB roughly quadruples the loudness.")
+            }
+
             BackgroundItem {
                 id: videoItem
-                visible: !isAudioOnly
+                visible: !isAudioOnly && !isRegain
 
                 width: parent.width
                 height: vColumn.height + vLbl.height
@@ -225,6 +267,7 @@ Page {
 
             BackgroundItem {
                 id: audioItem
+                visible: !isRegain
                 height: aColumn.height + aLbl.height
 
                 onClicked: pageStack.push(Qt.resolvedUrl("DetailsSettings.qml"), { dataContainer: page, isAudioDialog: true } )

@@ -61,7 +61,11 @@ Dialog {
             }
             onClicked: {
                 if (title.indexOf("---") !== 0) {
-                    dataContainer.container = title
+                    // Entries whose display title is not a usable file
+                    // extension (e.g. regain) carry one in the ext role.
+                    dataContainer.container =
+                        (typeof ext !== "undefined" && ext !== "") ? ext : title
+                    dataContainer.isRegain = (type === "regain")
                     if (type !== "audio") {
                         // Set default video here
                         dataContainer.isAudioOnly = false

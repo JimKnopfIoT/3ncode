@@ -254,6 +254,19 @@ File saved to </source>
         <source>About </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Gain — how much louder the audio gets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>+%1 dB</source>
+        <extracomment>%1 is the gain in decibels; roughly +6 dB = twice as loud</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The video stream is copied untouched — fast and lossless. Only the audio is amplified. The original file is kept; the result is saved as a copy. +12 dB roughly quadruples the loudness.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ImageControls</name>

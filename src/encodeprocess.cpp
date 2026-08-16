@@ -15,7 +15,9 @@ void encodeProcess::runFFmpeg()
 {
     QString appPath("/usr/share/harbour-encode/");
     QString appName("ffmpeg_static");
-    ffmpegProc.start(appPath+appName + " -y " + mCmd); // -y to always overwrite and not ask
+    // -y: always overwrite, never ask. -hide_banner: keep stderr to the
+    // actual error message — the error overlay shows this output verbatim.
+    ffmpegProc.start(appPath+appName + " -y -hide_banner " + mCmd);
     connect(&ffmpegProc, SIGNAL(finished(int)), this, SLOT(getffmpegOutput(int)));
 }
 

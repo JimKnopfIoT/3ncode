@@ -3,6 +3,25 @@ import QtQuick 2.0
 ListModel {
     id: containerModel
     ListElement {
+        title: "---Fix---"
+    }
+    ListElement {
+        // Boost too quiet recordings: video stream is copied untouched,
+        // only the audio is amplified and re-encoded.
+        title: "regain (louder audio, video untouched)"
+        ext: "mp4"
+        type: "regain"
+        vcodec: "copy"
+        vbitrate: "0"
+        resolution: "no change"
+        aspect: "no change"
+        acodec: "aac"
+        abitrate: "192"
+        sample: "48000"
+        channel: "2"
+        lang: "not set"
+    }
+    ListElement {
         title: "---Video---"
     }
     ListElement {
@@ -12,7 +31,7 @@ ListModel {
         vbitrate: "777"
         resolution: "no change"
         aspect: "no change"
-        acodec: "libfaac"
+        acodec: "aac"
         abitrate: "128"
         sample: "44100"
         channel: "2"
@@ -51,7 +70,7 @@ ListModel {
         vbitrate: "777"
         resolution: "no change"
         aspect: "no change"
-        acodec: "libfaac"
+        acodec: "aac"
         abitrate: "128"
         sample: "44100"
         channel: "2"
@@ -134,7 +153,7 @@ ListModel {
     ListElement {
         title: "m4a"
         type: "audio"
-        acodec: "libfaac"
+        acodec: "aac"
         abitrate: "128"
         sample: "44100"
         channel: "2"
